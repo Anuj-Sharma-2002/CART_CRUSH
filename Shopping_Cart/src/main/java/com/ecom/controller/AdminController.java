@@ -142,7 +142,7 @@ public class AdminController {
 			return "redirect:/admin/loadEditCategory/"+category.getID();
 		}
 		
-	 //  To Get Add Product Page 
+	 //  To Load  Add Product Page 
 		@GetMapping(value="/loadAddProduct")
 		
 		public String loadAddProduct(Model m) {
@@ -179,4 +179,62 @@ public class AdminController {
 		}
 			return "redirect:/admin/loadAddProduct";
 		}
+		
+	 //To get All the product in view 
+		@GetMapping(value="/products")
+		public String loadViewProduct(Model m) {
+			m.addAttribute("products", productService.getAllProduct());
+			return "/admin/products";
+		}
+		
+	// Delete Mapping for Delete product
+		@GetMapping(value="/deleteProduct/{id}")
+		public String deletePreoduct(@PathVariable int id, HttpSession session) {
+			boolean status = productService.deleteProduct(id);
+			
+			if(status) {
+				session.setAttribute("succMsg", "Product Deleted Succsessfully");
+			}else {
+				session.setAttribute("errorMsg", "Product not deleted due to some error ");
+			}
+			return "redirect:/admin/products";
+		}
+		
+		
+	// Edit Product load page 
+		
+		@GetMapping(value ="/editProduct/{id}")
+		public String loadEditProduct(@PathVariable int id , Model m) {
+			m.addAttribute("product", productService.getProductById(id));
+			return "/admin/edit_product";
+		}
+		
+	   @PostMapping(value="/updateProduct")
+	   public String updateProduct(@ModelAttribute Product product , @RequestParam ("file") MultipartFile file , HttpSession session) throws IOException {
+		   
+		   Product oldProduct = productService.getProductById(product.getId());
+			if (ObjectUtils.isEmpty(oldProduct)) {
+			    session.setAttribute("errorMsg", "Product not updated due to internal error");
+			    return "redirect:/admin/editProduct/" + product.getId();
+			}
+
+			String imageName = file.isEmpty() ? oldProduct.getImage() : file.getOriginalFilename();
+			product.setImage(imageName);
+
+			Product updatedProduct = productService.SaveProduct(product);
+
+			if (updatedProduct != null) {
+			    if (!file.isEmpty()) {
+			        File saveFile = new ClassPathResource("static/img").getFile();
+			        Path path = Paths.get(saveFile.getAbsolutePath() + File.separator + "product_img" + File.separator + imageName);
+			        Files.copy(file.getInputStream(), path, StandardCopyOption.REPLACE_EXISTING);
+			        System.out.println(path);
+			    }
+			    session.setAttribute("succMsg", "Product updated successfully");
+			} else {
+			    session.setAttribute("errorMsg", "Product not updated due to internal error");
+			}
+		   
+		   return "redirect:/admin/editProduct/" +product.getId();
+	   }
 }
