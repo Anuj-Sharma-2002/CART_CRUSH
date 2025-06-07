@@ -14,7 +14,7 @@ public class CommonServieImpl implements CommonService {
     *  
     *  */
 	@Override
-	public void removeSession() {
+	public void removeSessionMessage() {
 		HttpServletRequest request = ((ServletRequestAttributes)(RequestContextHolder.getRequestAttributes())).getRequest();
 		HttpSession session = request.getSession();
 		session.removeAttribute("succMsg");

@@ -58,7 +58,7 @@ public class AdminController {
 		public String saveCategory(@ModelAttribute Category category , @RequestParam ("file") MultipartFile file ,
 				HttpSession session) throws IOException{
 			// Get File Name so we store file name in SQL
-			    String imageName=  file != null ? file.getOriginalFilename() :"default.jpg";
+			    String imageName=  file.isEmpty() ? "default.jpg" :file.getOriginalFilename();
 			// Set file Name in Category Object
 			    category.setImageName(imageName);
 			    
@@ -75,7 +75,7 @@ public class AdminController {
 				}else {
 					// Start File Storing work
 					File saveFile = new ClassPathResource("/static/img").getFile();
-		            Path path=Paths.get(saveFile.getAbsolutePath()+File.separator+"category_img"+File.separator+file.getOriginalFilename());
+		            Path path=Paths.get(saveFile.getAbsolutePath()+File.separator+"category_img"+File.separator+imageName);
 				System.out.println(path);
 					Files.copy(file.getInputStream(), path, StandardCopyOption.REPLACE_EXISTING);
 					// End File Storing work 
@@ -131,7 +131,7 @@ public class AdminController {
 			    // this is used to store new image in category folder
 				if(!file.isEmpty()) {
 					 File saveFile = new ClassPathResource("/static/img").getFile();
-			         Path path=Paths.get(saveFile.getAbsolutePath()+File.separator+"category_img"+File.separator+file.getOriginalFilename());
+			         Path path=Paths.get(saveFile.getAbsolutePath()+File.separator+"category_img"+File.separator+imgName);
 			         Files.copy(file.getInputStream(), path, StandardCopyOption.REPLACE_EXISTING);
 				 }
 				session.setAttribute("errorMsg", "Category not update due to internal error");
@@ -144,26 +144,38 @@ public class AdminController {
 		
 	 //  To Get Add Product Page 
 		@GetMapping(value="/loadAddProduct")
+		
 		public String loadAddProduct(Model m) {
-			m.addAttribute("categorys", categoryService.getAllCategory());
+			m.addAttribute("categories", categoryService.getAllCategory());
 			return"admin/add_product";
 		}
     	
 	// To submit product 
 		@PostMapping(value="/saveProduct")
-		public String saveProduct(@ModelAttribute Product product , @RequestParam ("file") MultipartFile file , HttpSession session) throws IOException {
-		  String filename = file.isEmpty()?"defaul.jap" : file.getOriginalFilename();
-		  product.setImage(filename);
+		public String saveProduct(@ModelAttribute Product product , @RequestParam ("file") MultipartFile image , HttpSession session) throws IOException {
+			
+		  String imageName = image.isEmpty()?"defaul.jpg" : image.getOriginalFilename();
+		  
+		  product.setImage(imageName);
+		  
 		Product saveproduct=	productService.SaveProduct(product);
+		
 		if(!ObjectUtils.isEmpty(saveproduct)) {
 			
 			File saveFile = new ClassPathResource("/static/img").getFile();
-	         Path path=Paths.get(saveFile.getAbsolutePath()+File.separator+"product_img"+File.separator+filename);
-	         Files.copy(file.getInputStream(), path, StandardCopyOption.REPLACE_EXISTING);
+			
+	         Path path=Paths.get(saveFile.getAbsolutePath()+File.separator+"product_img"+File.separator+ imageName);
+	         
+	         Files.copy(image.getInputStream(), path, StandardCopyOption.REPLACE_EXISTING);
+	         
 	         System.out.println(path);
+	         
 			session.setAttribute("succMsg", "Product Save Succsessfull ");
+			
 		}else {
+			
 			session.setAttribute("errorMsg","Product not save due to some erorr");
+			
 		}
 			return "redirect:/admin/loadAddProduct";
 		}

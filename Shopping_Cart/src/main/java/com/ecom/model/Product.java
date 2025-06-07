@@ -32,6 +32,9 @@ public class Product {
     
     private String image;
 
+    private String category;
+    
+    
 	public Integer getId() {
 		return id;
 	}
@@ -79,7 +82,15 @@ public class Product {
 	public void setImage(String image) {
 		this.image = image;
 	}
-
+   
+	public String getCategory() {
+		return category;
+	}
+	
+	public void setCategory(String category) {
+		this.category=category;
+	}
+	
 	public Product() {
 		super();
 		// TODO Auto-generated constructor stub

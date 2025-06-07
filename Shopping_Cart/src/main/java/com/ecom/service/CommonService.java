@@ -1,5 +1,5 @@
 package com.ecom.service;
 
 public interface CommonService {
-    public void removeSession();
+    public void removeSessionMessage();
 }
