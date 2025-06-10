@@ -34,6 +34,11 @@ public class Product {
 
     private String category;
     
+    private int discount;
+    
+    private Double discountPrice;
+    
+    private Boolean isActive;
     
 	public Integer getId() {
 		return id;

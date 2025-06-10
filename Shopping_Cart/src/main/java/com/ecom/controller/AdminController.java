@@ -111,37 +111,38 @@ public class AdminController {
 			m.addAttribute("category", categoryService.getCategoryById(id));
 			return "admin/edit_category";
 		}
+		
 	// Edit Category Post Mapping
 		
 		@PostMapping(value="/updateCategory")
 		public String updateCategory(@ModelAttribute Category category , @RequestParam("file") MultipartFile file , HttpSession session) throws IOException {
 			
 			Category oldCategory = categoryService.getCategoryById(category.getID());
-			String imgName = file.isEmpty() ? oldCategory.getImageName() : file.getOriginalFilename();
-			
-			if(!ObjectUtils.isEmpty(oldCategory)) {
-				oldCategory.setName(category.getName());
-				oldCategory.setIsActive(category.getIsActive());
-				oldCategory.setImageName(imgName);
+			if (ObjectUtils.isEmpty(oldCategory)) {
+			    session.setAttribute("errorMsg", "Category not updated due to internal error");
+			    return "redirect:/admin/loadEditCategory/"+category.getID();
 			}
-			
-			Category updateCategory = categoryService.saveCategory(oldCategory);     //   we use the save method of jpa to save data but it also used to update data  
-			
-			if(ObjectUtils.isEmpty(updateCategory)) {
-			    // this is used to store new image in category folder
-				if(!file.isEmpty()) {
-					 File saveFile = new ClassPathResource("/static/img").getFile();
-			         Path path=Paths.get(saveFile.getAbsolutePath()+File.separator+"category_img"+File.separator+imgName);
-			         Files.copy(file.getInputStream(), path, StandardCopyOption.REPLACE_EXISTING);
-				 }
-				session.setAttribute("errorMsg", "Category not update due to internal error");
-			}else {
-				session.setAttribute("succMsg", "Category updated SuccsessFull");
+
+			String imageName = file.isEmpty() ? oldCategory.getImageName() : file.getOriginalFilename();
+			category.setImageName(imageName);
+
+			Category updatedCategory = categoryService.saveCategory(category);
+
+			if (updatedCategory != null) {
+			    if (!file.isEmpty()) {
+			        File saveFile = new ClassPathResource("static/img").getFile();
+			        Path path = Paths.get(saveFile.getAbsolutePath() + File.separator + "category_img" + File.separator + imageName);
+			        Files.copy(file.getInputStream(), path, StandardCopyOption.REPLACE_EXISTING);
+			        System.out.println(path);
+			    }
+			    session.setAttribute("succMsg", "Category updated successfully");
+			} else {
+			    session.setAttribute("errorMsg", "Category not updated due to internal error");
 			}
+
 			
 			return "redirect:/admin/loadEditCategory/"+category.getID();
 		}
-		
 	 //  To Load  Add Product Page 
 		@GetMapping(value="/loadAddProduct")
 		
@@ -157,6 +158,9 @@ public class AdminController {
 		  String imageName = image.isEmpty()?"defaul.jpg" : image.getOriginalFilename();
 		  
 		  product.setImage(imageName);
+		  product.setDiscount(0);
+		  product.setDiscountPrice(product.getPrice());
+		  
 		  
 		Product saveproduct=	productService.SaveProduct(product);
 		
@@ -206,35 +210,27 @@ public class AdminController {
 		@GetMapping(value ="/editProduct/{id}")
 		public String loadEditProduct(@PathVariable int id , Model m) {
 			m.addAttribute("product", productService.getProductById(id));
+			m.addAttribute("categories",categoryService.getAllCategory());
 			return "/admin/edit_product";
 		}
+		
+		
+	// Update product  by edit method 	
+		
 		
 	   @PostMapping(value="/updateProduct")
 	   public String updateProduct(@ModelAttribute Product product , @RequestParam ("file") MultipartFile file , HttpSession session) throws IOException {
 		   
-		   Product oldProduct = productService.getProductById(product.getId());
-			if (ObjectUtils.isEmpty(oldProduct)) {
-			    session.setAttribute("errorMsg", "Product not updated due to internal error");
-			    return "redirect:/admin/editProduct/" + product.getId();
-			}
-
-			String imageName = file.isEmpty() ? oldProduct.getImage() : file.getOriginalFilename();
-			product.setImage(imageName);
-
-			Product updatedProduct = productService.SaveProduct(product);
-
-			if (updatedProduct != null) {
-			    if (!file.isEmpty()) {
-			        File saveFile = new ClassPathResource("static/img").getFile();
-			        Path path = Paths.get(saveFile.getAbsolutePath() + File.separator + "product_img" + File.separator + imageName);
-			        Files.copy(file.getInputStream(), path, StandardCopyOption.REPLACE_EXISTING);
-			        System.out.println(path);
-			    }
-			    session.setAttribute("succMsg", "Product updated successfully");
+		   if (product.getDiscount() < 0 || product.getDiscount() > 100) {
+				session.setAttribute("errorMsg", "invalid Discount");
 			} else {
-			    session.setAttribute("errorMsg", "Product not updated due to internal error");
+				Product updateProduct = productService.updateProduct(product, file);
+				if (!ObjectUtils.isEmpty(updateProduct)) {
+					session.setAttribute("succMsg", "Product update success");
+				} else {
+					session.setAttribute("errorMsg", "Something wrong on server");
+				}
 			}
-		   
 		   return "redirect:/admin/editProduct/" +product.getId();
 	   }
 }
