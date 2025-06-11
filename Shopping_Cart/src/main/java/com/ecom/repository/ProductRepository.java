@@ -10,5 +10,7 @@ import com.ecom.model.Product;
 @Repository
 public interface ProductRepository extends JpaRepository<Product, Integer> {
 	
+	public List<Product> findByCategoryAndIsActiveTrue(String category);
+	
 	public List<Product> findByIsActiveTrue();
 }

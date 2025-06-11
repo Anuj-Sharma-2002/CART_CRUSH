@@ -12,5 +12,5 @@ public interface CategoryRepository extends JpaRepository<Category, Integer>  {
 	
 		public Boolean existsByName(String name); // check category exist or not
 		
-		public List<Category> findByIsActiveTrue();
+		public List<Category> findByIsActiveTrue(); // Gating only Active category those are true
 }

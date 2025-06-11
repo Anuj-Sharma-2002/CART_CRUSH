@@ -32,9 +32,9 @@
 					<div class="card shadow-sm p-0 mb-5 bg-body-tertiary rounded">
 						<div class="card-body">
 							<div class="list-group">
-								<p class="fs-5">Category</p>
-								<a href="/products"
-									th:classappend="${paramValue==''} ? 'active':''"
+								<p class="fs-5">Category</p> <!-- th:href="@{'/products?category='+${c.name}}"  By This line we created Url by RequestPram and fatch data in Home controller   -->
+								<a href="/products"           
+									th:classappend="${paramValue==''} ? 'active':''"   
 									class="list-group-item list-group-item-action"
 									aria-current="true"> All </a> <a th:each="c:${categories}"
 									th:href="@{'/products?category='+${c.name}}"
