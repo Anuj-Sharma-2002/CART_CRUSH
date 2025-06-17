@@ -40,6 +40,7 @@ public class Product {
     
     private Boolean isActive;
     
+    
 	public Integer getId() {
 		return id;
 	}
