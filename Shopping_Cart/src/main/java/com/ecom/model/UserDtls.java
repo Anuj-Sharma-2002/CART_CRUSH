@@ -37,4 +37,6 @@ public class UserDtls {
 	private String profileImage;
 	
 	private String password;
+	
+	private String role;
 }
