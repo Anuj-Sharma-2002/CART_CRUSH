@@ -6,6 +6,8 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
+import java.security.Principal;
+import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ClassPathResource;
@@ -22,8 +24,10 @@ import org.springframework.web.multipart.MultipartFile;
 
 import com.ecom.model.Category;
 import com.ecom.model.Product;
+import com.ecom.model.UserDtls;
 import com.ecom.service.CategoryService;
 import com.ecom.service.ProductService;
+import com.ecom.service.UserService;
 
 import jakarta.servlet.http.HttpSession;
 
@@ -37,6 +41,25 @@ public class AdminController {
 	 @Autowired
 	 private ProductService productService;
 	 
+	 @Autowired
+	 private UserService  userService;
+	 
+	 
+	// This method is for Checking witch person is login if login provide a respective panal for it. This method call every time 
+		// when ever this controller call
+		@ModelAttribute
+		public void getUserDetails(Principal p , Model m) {
+			
+			if(p != null) {
+				String email  = p.getName();
+				UserDtls userDtls = userService.getUserDtlsByEmail(email);
+				m.addAttribute("user", userDtls);
+			}
+			
+			List<Category> allActiveCategory = categoryService.getAllActiveCategory();
+			m.addAttribute("category1", allActiveCategory);
+		}
+		
 	 // To get index Page 
 		@GetMapping(value="/")
 		public String index() {

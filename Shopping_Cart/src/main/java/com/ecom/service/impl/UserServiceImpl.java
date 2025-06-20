@@ -27,4 +27,10 @@ public class UserServiceImpl implements UserService {
 		return userRepository.save(userDtls);
 	}
 
+	@Override
+	public UserDtls getUserDtlsByEmail(String email) {
+		
+		return userRepository.findByEmail(email);
+	}
+
 }
