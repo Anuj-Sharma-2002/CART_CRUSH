@@ -48,7 +48,7 @@ public class AdminController {
 	// This method is for Checking witch person is login if login provide a respective panal for it. This method call every time 
 		// when ever this controller call
 		@ModelAttribute
-		public void getUserDetails(Principal p , Model m) {
+		public void getUserLoginDetails(Principal p , Model m) {
 			
 			if(p != null) {
 				String email  = p.getName();
@@ -255,5 +255,28 @@ public class AdminController {
 				}
 			}
 		   return "redirect:/admin/editProduct/" +product.getId();
+	   }
+	   
+	   @GetMapping("/users")
+	   public String getAllUsersDtls(Model m) {
+		   
+		   List<UserDtls> userDtls = userService.findByRole("ROLE_USER");
+		   System.out.println(userDtls);
+		   m.addAttribute("users", userDtls);
+		   return "admin/users";
+	   }
+	   
+	   @GetMapping("/updateUserStatus")
+	   public String updateAcountStatus(@RequestParam Boolean status , @RequestParam Integer id,HttpSession session) {
+		   
+		   Boolean value = userService.updateAcountStatus( status ,  id);
+		   
+		   if(value) {
+			   session.setAttribute("succMsg","User Status Update Succsessfull");
+		   }else {
+			   session.setAttribute("errorMsg","User Status Not change Due to some eroror");
+		   }
+		   
+		   return "redirect:/admin/users";
 	   }
 }

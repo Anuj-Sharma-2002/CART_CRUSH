@@ -34,7 +34,7 @@ public class UserController {
 	// This method is for Checking witch person is login if login provide a respective panal for it. This method call every time 
 	// when ever this controller call
 			@ModelAttribute
-			public void getUserDetails(Principal p , Model m) {
+			public void getUserLoginDetails(Principal p , Model m) {
 				
 				if(p != null) {
 					String email  = p.getName();

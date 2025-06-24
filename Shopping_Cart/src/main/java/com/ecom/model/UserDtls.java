@@ -39,4 +39,6 @@ public class UserDtls {
 	private String password;
 	
 	private String role;
+	
+	private Boolean isEnable;
 }

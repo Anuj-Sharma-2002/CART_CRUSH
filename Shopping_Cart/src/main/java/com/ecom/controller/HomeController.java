@@ -42,15 +42,18 @@ public class HomeController {
 	private UserService userService; 
      
 	
-	// This method is for Checking witch person is login if login provide a respective panal for it. This method call every time 
+	// This method is for Checking witch person is login if login provide a respective panel for it. This method call every time 
 		// when ever this controller call
+	
+	// Hear Principle is an interface it provide a name of user that login it has only one method p.getName()
 	@ModelAttribute
-	public void getUserDetails(Principal p , Model m) {
+	public void getUserLoginDetails(Principal p , Model m) {
 		
 		if(p != null) {
 			String email  = p.getName();
 			UserDtls userDtls = userService.getUserDtlsByEmail(email);
 			m.addAttribute("user", userDtls);
+			
 		}
 		List<Category> allActiveCategory = categoryService.getAllActiveCategory();
 		m.addAttribute("category1", allActiveCategory);
@@ -68,7 +71,7 @@ public class HomeController {
 	
 	@GetMapping(value="/register")
 	public String register(Model m) {
-		m.addAttribute("user", new UserDtls());
+		//m.addAttribute("user", new UserDtls());
 		return "register";
 	}
 	
